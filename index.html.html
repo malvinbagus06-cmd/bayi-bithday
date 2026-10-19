@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sandra's App 💕</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Nunito', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: 'var(--color-50)', 100: 'var(--color-100)', 200: 'var(--color-200)',
+                            300: 'var(--color-300)', 400: 'var(--color-400)', 500: 'var(--color-500)',
+                            600: 'var(--color-600)', 700: 'var(--color-700)',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Theme Variables */
+        :root[data-theme="pink"] {
+            --color-50: #fff0f5; --color-100: #ffe4e6; --color-200: #fecdd3;
+            --color-300: #fda4af; --color-400: #fb7185; --color-500: #f43f5e;
+            --color-600: #e11d48; --color-700: #be123c;
+            --bg-body: #fff5f7; --panel-bg: rgba(255, 255, 255, 0.85); --text-main: #1e293b;
+        }
+        :root[data-theme="purple"] {
+            --color-50: #f5f3ff; --color-100: #ede9fe; --color-200: #ddd6fe;
+            --color-300: #c4b5fd; --color-400: #a78bfa; --color-500: #8b5cf6;
+            --color-600: #7c3aed; --color-700: #6d28d9;
+            --bg-body: #faf5ff; --panel-bg: rgba(255, 255, 255, 0.85); --text-main: #1e293b;
+        }
+        :root[data-theme="mint"] {
+            --color-50: #f0fdf4; --color-100: #dcfce7; --color-200: #bbf7d0;
+            --color-300: #86efac; --color-400: #4ade80; --color-500: #22c55e;
+            --color-600: #16a34a; --color-700: #15803d;
+            --bg-body: #f0fdf4; --panel-bg: rgba(255, 255, 255, 0.85); --text-main: #1e293b;
+        }
+        :root[data-theme="peach"] {
+            --color-50: #fff7ed; --color-100: #ffedd5; --color-200: #fed7aa;
+            --color-300: #fdba74; --color-400: #fb923c; --color-500: #f97316;
+            --color-600: #ea580c; --color-700: #c2410c;
+            --bg-body: #fff7ed; --panel-bg: rgba(255, 255, 255, 0.85); --text-main: #1e293b;
+        }
+        :root[data-theme="dark"] {
+            --color-50: #334155; --color-100: #475569; --color-200: #64748b;
+            --color-300: #94a3b8; --color-400: #cbd5e1; --color-500: #e2e8f0;
+            --color-600: #f1f5f9; --color-700: #f8fafc;
+            --bg-body: #0f172a; --panel-bg: rgba(30, 41, 59, 0.85); --text-main: #f8fafc;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.5); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(156, 163, 175, 0.8); }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Floating Hearts Animation */
+        @keyframes float {
+            0% { transform: translateY(100vh) scale(0.5); opacity: 0.8; }
+            100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+        }
+        .heart-bg {
+            position: fixed;
+            font-size: 1.5rem;
+            animation: float linear infinite;
+            z-index: 1;
+            pointer-events: none;
+            color: var(--color-400);
+            opacity: 0;
+        }
+    </style>
+</head>
+<body class="antialiased h-screen overflow-hidden flex flex-col md:flex-row selection:bg-brand-200 relative">
+
+    <!-- Floating Hearts Container -->
+    <div id="heartsContainer" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
+
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="hidden md:flex flex-col w-72 glass-panel border-r border-slate-200/20 z-20 h-full shadow-lg">
+        <div class="p-6 pb-2 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img id="sidebarAvatar" src="https://placehold.co/150x150/fda4af/ffffff?text=S" class="w-12 h-12 rounded-full object-cover border-2 border-brand-400 shadow-md" alt="Avatar">
+                <div>
+                    <h1 id="sidebarAppName" class="font-display font-bold text-xl leading-tight">Sandra's App</h1>
+                    <p id="sidebarUserName" class="text-sm font-semibold text-brand-500">Halo, Sandra! 💕</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="px-6 py-4">
+            <div class="bg-brand-500/10 border border-brand-500/20 rounded-2xl p-4 shadow-sm relative overflow-hidden">
+                <div class="absolute -right-4 -bottom-4 text-5xl opacity-20">✨</div>
+                <p id="sidebarQuote" class="text-sm font-medium italic relative z-10 opacity-80">"Semoga harimu selalu ceria!"</p>
+            </div>
+        </div>
+
+        <div class="px-6 pb-4">
+            <button onclick="openActionMenu()" class="w-full bg-gradient-to-r from-brand-400 to-brand-600 text-white font-bold py-3 rounded-2xl shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                <i data-lucide="plus" class="w-5 h-5"></i> Tambah Data
+            </button>
+        </div>
+
+        <nav class="flex-1 px-4 space-y-2 mt-2 overflow-y-auto hide-scrollbar">
+            <button onclick="switchTab('money')" id="nav-desktop-money" class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all bg-brand-500 text-white shadow-md">
+                <i data-lucide="wallet" class="w-5 h-5"></i> Keuangan
+            </button>
+            <button onclick="switchTab('journal')" id="nav-desktop-journal" class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all opacity-70 hover:opacity-100 hover:bg-brand-500/10">
+                <i data-lucide="book-heart" class="w-5 h-5"></i> Jurnal
+            </button>
+            <button onclick="switchTab('settings')" id="nav-desktop-settings" class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all opacity-70 hover:opacity-100 hover:bg-brand-500/10">
+                <i data-lucide="settings" class="w-5 h-5"></i> Pengaturan
+            </button>
+
+            <!-- Spotify Widget (Desktop) -->
+            <div class="pt-6 pb-2">
+                <p class="text-xs font-bold opacity-50 px-2 mb-2">NOW PLAYING</p>
+                <div class="rounded-2xl overflow-hidden shadow-sm border border-slate-200/20">
+                    <iframe id="spotifyFrameDesktop" src="" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                </div>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- MOBILE HEADER -->
+    <header class="md:hidden glass-panel border-b border-slate-200/20 sticky top-0 z-20 px-5 py-4 flex items-center justify-between shadow-sm">
+        <div class="flex items-center gap-3">
+            <img id="mobileAvatar" src="https://placehold.co/150x150/fda4af/ffffff?text=S" class="w-10 h-10 rounded-full object-cover border-2 border-brand-400 shadow-sm" alt="Avatar">
+            <div>
+                <h1 id="mobileAppName" class="font-display font-bold text-lg leading-tight">Sandra's App</h1>
+                <p id="mobileUserName" class="text-xs font-semibold text-brand-500">Halo, Sandra! 💕</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 overflow-y-auto pb-24 md:pb-6 relative h-full">
+        
+        <!-- Spotify Widget (Mobile) - Positioned at top of content -->
+        <div class="md:hidden p-4 pb-0 max-w-5xl mx-auto w-full">
+            <div class="rounded-2xl overflow-hidden shadow-sm border border-slate-200/20 bg-slate-100 dark:bg-slate-800">
+                <iframe id="spotifyFrameMobile" src="" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+            </div>
+        </div>
+
+        <div class="p-4 md:p-8 max-w-5xl mx-auto space-y-6">
+
+            <!-- ================= TAB 1: KEUANGAN ================= -->
+            <section id="tab-money" class="space-y-6 animate-fade-in">
+                <!-- Balance Card -->
+                <div class="glass-panel rounded-3xl p-6 md:p-8 shadow-sm relative overflow-hidden flex flex-col justify-center border border-white/20">
+                    <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-brand-400/20 rounded-full blur-3xl"></div>
+                    <h3 class="text-sm font-semibold opacity-70 uppercase tracking-wide">Total Sisa Saldo</h3>
+                    <div class="text-4xl md:text-5xl font-display font-bold mt-2 mb-6" id="totalBalance">Rp 0</div>
+                    
+                    <div class="flex gap-4">
+                        <div class="bg-emerald-500/10 p-3 md:p-4 rounded-2xl flex-1 border border-emerald-500/20">
+                            <span class="text-xs md:text-sm font-bold text-emerald-500 flex items-center gap-1"><i data-lucide="arrow-down-left" class="w-4 h-4"></i> Pemasukan</span>
+                            <p id="totalIncome" class="font-display font-bold text-base md:text-xl mt-1">Rp 0</p>
+                        </div>
+                        <div class="bg-rose-500/10 p-3 md:p-4 rounded-2xl flex-1 border border-rose-500/20">
+                            <span class="text-xs md:text-sm font-bold text-rose-500 flex items-center gap-1"><i data-lucide="arrow-up-right" class="w-4 h-4"></i> Pengeluaran</span>
+                            <p id="totalExpense" class="font-display font-bold text-base md:text-xl mt-1">Rp 0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics & History Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    
+                    <!-- Chart Section -->
+                    <div class="glass-panel rounded-3xl p-6 shadow-sm flex flex-col">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-display font-bold text-lg flex items-center gap-2">
+                                <i data-lucide="pie-chart" class="w-5 h-5 text-brand-500"></i> Analisis Pengeluaran
+                            </h3>
+                            <button onclick="openModal('categoriesModal')" class="text-xs font-bold bg-brand-500/10 text-brand-600 px-3 py-1.5 rounded-xl hover:bg-brand-500/20 transition">
+                                Kelola Kategori
+                            </button>
+                        </div>
+                        <div class="flex-1 flex flex-col md:flex-row items-center gap-6">
+                            <div class="relative w-48 h-48 flex-shrink-0">
+                                <canvas id="expenseChart"></canvas>
+                            </div>
+                            <div id="chartLegend" class="w-full md:flex-1 space-y-2 max-h-48 overflow-y-auto hide-scrollbar pr-2">
+                                <!-- Legend Items via JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- History Section -->
+                    <div class="glass-panel rounded-3xl p-6 shadow-sm flex flex-col h-[400px] md:h-[auto] max-h-[500px]">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-display font-bold text-lg flex items-center gap-2">
+                                <i data-lucide="history" class="w-5 h-5 text-brand-500"></i> Riwayat
+                            </h3>
+                            <select id="filterCat" onchange="renderTransactions()" class="bg-transparent border border-brand-500/30 text-xs rounded-xl px-2 py-1 outline-none font-semibold focus:ring-2 focus:ring-brand-500">
+                                <option value="ALL">Semua</option>
+                            </select>
+                        </div>
+                        <div id="transactionList" class="flex-1 overflow-y-auto space-y-3 hide-scrollbar pr-2">
+                            <!-- Transactions via JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TAB 2: JURNAL ================= -->
+            <section id="tab-journal" class="space-y-6 hidden animate-fade-in">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h2 class="font-display font-bold text-2xl">Jurnal Kenangan</h2>
+                        <p class="text-sm opacity-70 mt-1">Abadikan ceritamu hari ini.</p>
+                    </div>
+                </div>
+                <div id="journalGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Journals via JS -->
+                </div>
+            </section>
+
+            <!-- ================= TAB 3: SETTINGS ================= -->
+            <section id="tab-settings" class="space-y-6 hidden animate-fade-in">
+                <div class="glass-panel rounded-3xl p-6 md:p-8 shadow-sm max-w-2xl mx-auto">
+                    <h3 class="font-display font-bold text-xl border-b border-slate-500/20 pb-4 mb-6 flex items-center gap-2">
+                        <i data-lucide="sliders" class="w-6 h-6 text-brand-500"></i> Personalisasi
+                    </h3>
+
+                    <div class="space-y-5">
+                        <!-- Avatar -->
+                        <div class="flex items-center gap-5">
+                            <img id="previewSetAvatar" src="" class="w-20 h-20 rounded-full object-cover border-4 border-brand-200 shadow-md">
+                            <div class="flex-1">
+                                <label class="block text-sm font-bold opacity-80 mb-1">Foto Profil</label>
+                                <input type="file" accept="image/*" onchange="handleSettingsAvatar(this)" class="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-brand-500/20 file:text-brand-600 hover:file:bg-brand-500/30 cursor-pointer">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-bold opacity-80 mb-1">Nama Aplikasi</label>
+                                <input type="text" id="setAppName" class="w-full p-3 rounded-xl bg-black/5 border border-slate-500/20 focus:outline-none focus:border-brand-500 text-sm font-medium">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold opacity-80 mb-1">Nama Panggilan</label>
+                                <input type="text" id="setUserName" class="w-full p-3 rounded-xl bg-black/5 border border-slate-500/20 focus:outline-none focus:border-brand-500 text-sm font-medium">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold opacity-80 mb-1">Quote Penyemangat</label>
+                            <textarea id="setQuote" rows="2" class="w-full p-3 rounded-xl bg-black/5 border border-slate-500/20 focus:outline-none focus:border-brand-500 text-sm font-medium"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold opacity-80 mb-1 flex items-center gap-2">
+                                <i data-lucide="headphones" class="w-4 h-4 text-green-500"></i> Spotify Link (Track/Playlist)
+                            </label>
+                            <input type="text" id="setSpotify" placeholder="Misal: https://open.spotify.com/playlist/..." class="w-full p-3 rounded-xl bg-black/5 border border-slate-500/20 focus:outline-none focus:border-brand-500 text-sm font-medium">
+                            <p class="text-[10px] opacity-60 mt-1">Copy link lagu atau playlist dari Spotify lalu paste di sini.</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold opacity-80 mb-3">Tema Warna</label>
+                            <div class="grid grid-cols-5 gap-2">
+                                <button onclick="changeTheme('pink')" class="h-10 rounded-xl bg-[#f43f5e] shadow-sm hover:scale-110 transition border-2 border-transparent focus:border-white" title="Pink"></button>
+                                <button onclick="changeTheme('purple')" class="h-10 rounded-xl bg-[#8b5cf6] shadow-sm hover:scale-110 transition border-2 border-transparent focus:border-white" title="Purple"></button>
+                                <button onclick="changeTheme('mint')" class="h-10 rounded-xl bg-[#22c55e] shadow-sm hover:scale-110 transition border-2 border-transparent focus:border-white" title="Mint"></button>
+                                <button onclick="changeTheme('peach')" class="h-10 rounded-xl bg-[#f97316] shadow-sm hover:scale-110 transition border-2 border-transparent focus:border-white" title="Peach"></button>
+                                <button onclick="changeTheme('dark')" class="h-10 rounded-xl bg-[#334155] shadow-sm hover:scale-110 transition border-2 border-transparent focus:border-white" title="Dark"></button>
+                            </div>
+                        </div>
+
+                        <button onclick="savePersonalization()" class="w-full bg-brand-500 text-white font-bold py-3.5 rounded-xl shadow-md hover:bg-brand-600 transition flex justify-center items-center gap-2 mt-4">
+                            <i data-lucide="save" class="w-5 h-5"></i> Simpan Perubahan
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Data Management -->
+                <div class="glass-panel rounded-3xl p-6 shadow-sm max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 border border-white/20">
+                    <div>
+                        <h4 class="font-display font-bold">Manajemen Data</h4>
+                        <p class="text-xs opacity-70">Backup (unduh JSON) atau Import data.</p>
+                    </div>
+                    <div class="flex gap-2 w-full sm:w-auto">
+                        <button onclick="exportData()" class="flex-1 sm:flex-none bg-black/5 hover:bg-black/10 font-bold px-4 py-2.5 rounded-xl transition text-xs flex items-center justify-center gap-2">
+                            <i data-lucide="download" class="w-4 h-4"></i> Backup JSON
+                        </button>
+                        <label class="flex-1 sm:flex-none bg-brand-500/10 hover:bg-brand-500/20 text-brand-600 font-bold px-4 py-2.5 rounded-xl transition text-xs flex items-center justify-center gap-2 cursor-pointer">
+                            <i data-lucide="upload" class="w-4 h-4"></i> Import
+                            <input type="file" accept=".json" onchange="importData(event)" class="hidden">
+                        </label>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- MOBILE BOTTOM NAVIGATION -->
+    <nav class="md:hidden glass-panel fixed bottom-0 left-0 w-full z-30 border-t border-slate-200/20 flex justify-between items-center px-6 py-2 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] pb-safe rounded-t-3xl">
+        <button onclick="switchTab('money')" id="nav-mobile-money" class="flex flex-col items-center gap-1 text-brand-500 font-bold p-2 w-16">
+            <i data-lucide="wallet" class="w-6 h-6"></i>
+            <span class="text-[10px]">Uang</span>
+        </button>
+        <button onclick="switchTab('journal')" id="nav-mobile-journal" class="flex flex-col items-center gap-1 text-slate-400 font-medium p-2 w-16 mr-8">
+            <i data-lucide="book-heart" class="w-6 h-6"></i>
+            <span class="text-[10px]">Jurnal</span>
+        </button>
+
+        <!-- FLOATING CENTER BUTTON -->
+        <button onclick="openActionMenu()" class="absolute left-1/2 -translate-x-1/2 -top-6 w-14 h-14 bg-gradient-to-tr from-brand-400 to-brand-600 rounded-full shadow-xl text-white flex items-center justify-center hover:scale-105 transition transform border-4 border-[#fff5f7] dark:border-[#0f172a]" id="mobilePlusBtn">
+            <i data-lucide="plus" class="w-7 h-7"></i>
+        </button>
+
+        <button onclick="switchTab('settings')" id="nav-mobile-settings" class="flex flex-col items-center gap-1 text-slate-400 font-medium p-2 w-16 ml-8">
+            <i data-lucide="settings" class="w-6 h-6"></i>
+            <span class="text-[10px]">Profil</span>
+        </button>
+    </nav>
+
+    <!-- MODALS -->
+
+    <!-- Mobile Action Menu Modal -->
+    <div id="actionMenuModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end md:items-center justify-center hidden" onclick="closeModal('actionMenuModal')">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-t-3xl md:rounded-3xl p-6 space-y-4 shadow-2xl transform transition-transform" onclick="event.stopPropagation()">
+            <h3 class="font-display font-bold text-center mb-4">Mau tambah apa nih?</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="closeModal('actionMenuModal'); openModal('transactionModal')" class="bg-brand-500/10 hover:bg-brand-500/20 p-4 rounded-2xl flex flex-col items-center gap-2 text-brand-600 font-bold transition">
+                    <i data-lucide="wallet" class="w-8 h-8"></i> Keuangan
+                </button>
+                <button onclick="closeModal('actionMenuModal'); openModal('journalModal')" class="bg-purple-500/10 hover:bg-purple-500/20 p-4 rounded-2xl flex flex-col items-center gap-2 text-purple-600 font-bold transition">
+                    <i data-lucide="book-open" class="w-8 h-8"></i> Jurnal
+                </button>
+            </div>
+            <div class="pt-2 text-center md:hidden">
+                <button onclick="closeModal('actionMenuModal')" class="w-12 h-12 bg-slate-100 dark:bg-slate-700 rounded-full inline-flex items-center justify-center text-slate-500">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction Modal -->
+    <div id="transactionModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden" onclick="closeModal('transactionModal')">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-lg rounded-3xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="font-display font-bold text-xl">Catat Transaksi</h3>
+                <button onclick="closeModal('transactionModal')" class="text-slate-400 bg-slate-100 dark:bg-slate-700 p-2 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            
+            <form onsubmit="saveTransaction(event)" class="space-y-4 text-slate-800 dark:text-slate-200">
+                <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 dark:bg-slate-700 rounded-2xl">
+                    <button type="button" id="btnExpense" onclick="setTxType('expense')" class="py-2.5 text-sm font-bold rounded-xl bg-white dark:bg-slate-600 shadow-sm text-rose-500 transition">Pengeluaran</button>
+                    <button type="button" id="btnIncome" onclick="setTxType('income')" class="py-2.5 text-sm font-bold rounded-xl text-slate-500 dark:text-slate-300 transition">Pemasukan</button>
+                </div>
+                <input type="hidden" id="txType" value="expense">
+
+                <div>
+                    <label class="block text-xs font-bold opacity-70 mb-1">Nominal (Rp)</label>
+                    <input type="text" id="txAmount" oninput="formatCurrencyInput(this)" placeholder="0" required class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-400 text-2xl font-display font-bold">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold opacity-70 mb-1">Kategori</label>
+                        <select id="txCategory" required class="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-brand-400 text-sm font-semibold"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold opacity-70 mb-1">Tanggal</label>
+                        <input type="date" id="txDate" required class="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-brand-400 text-sm font-semibold">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold opacity-70 mb-1">Keterangan / Catatan</label>
+                        <input type="text" id="txNote" placeholder="Mis: Beli seblak" required class="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-brand-400 text-sm font-semibold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold opacity-70 mb-1">Lokasi (Opsional)</label>
+                        <input type="text" id="txLocation" placeholder="Mis: Gacoan Tebet" class="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-brand-400 text-sm font-semibold">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold opacity-70 mb-1">Upload Foto (Struk/Barang)</label>
+                    <input type="file" accept="image/*" onchange="handleImageInput(this, 'txImgPreview')" class="block w-full text-xs file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-brand-500/20 file:text-brand-600 cursor-pointer">
+                    <img id="txImgPreview" src="" class="mt-3 rounded-xl max-h-32 object-cover hidden border border-slate-200 shadow-sm cursor-pointer" onclick="openLightbox(this.src, 'Preview')">
+                </div>
+
+                <button type="submit" class="w-full bg-brand-500 text-white font-bold py-4 rounded-2xl shadow-md hover:bg-brand-600 transition mt-2">
+                    Simpan Transaksi
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Category Manager Modal -->
+    <div id="categoriesModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden" onclick="closeModal('categoriesModal')">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-3xl p-6 shadow-2xl" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="font-display font-bold text-xl">Kategori</h3>
+                <button onclick="closeModal('categoriesModal')" class="text-slate-400 bg-slate-100 dark:bg-slate-700 p-2 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form onsubmit="addCategory(event)" class="flex gap-2 mb-4">
+                <input type="text" id="catEmoji" placeholder="🍟" required class="w-14 p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-center text-lg text-slate-800 dark:text-slate-200">
+                <input type="text" id="catName" placeholder="Nama Kategori" required class="flex-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-800 dark:text-slate-200">
+                <button type="submit" class="bg-brand-500 text-white px-4 rounded-xl font-bold"><i data-lucide="plus" class="w-5 h-5"></i></button>
+            </form>
+            <div id="categoryList" class="space-y-2 max-h-60 overflow-y-auto hide-scrollbar text-slate-800 dark:text-slate-200"></div>
+        </div>
+    </div>
+
+    <!-- Journal Modal -->
+    <div id="journalModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden" onclick="closeModal('journalModal')">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-lg rounded-3xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="font-display font-bold text-xl">Tulis Jurnal</h3>
+                <button onclick="closeModal('journalModal')" class="text-slate-400 bg-slate-100 dark:bg-slate-700 p-2 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form onsubmit="saveJournal(event)" class="space-y-4 text-slate-800 dark:text-slate-200">
+                <div>
+                    <input type="text" id="jTitle" placeholder="Judul ceritamu..." required class="w-full p-0 py-2 border-b-2 border-slate-200 dark:border-slate-600 focus:border-brand-400 outline-none text-lg font-display font-bold bg-transparent">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold opacity-70 mb-1">Mood</label>
+                        <select id="jMood" class="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-semibold outline-none focus:ring-2 focus:ring-brand-400">
+                            <option value="🥰 Happy">🥰 Happy</option>
+                            <option value="✨ Excited">✨ Excited</option>
+                            <option value="🍕 Kenyang">🍕 Kenyang</option>
+                            <option value="😴 Capek">😴 Capek</option>
+                            <option value="🥺 Sedih">🥺 Sedih</option>
+                            <option value="😠 Kesal">😠 Kesal</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold opacity-70 mb-1">Tanggal</label>
+                        <input type="date" id="jDate" required class="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-semibold outline-none focus:ring-2 focus:ring-brand-400">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold opacity-70 mb-1">Cuaca</label>
+                        <select id="jWeather" class="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-semibold outline-none focus:ring-2 focus:ring-brand-400">
+                            <option value="☀️ Cerah">☀️ Cerah</option>
+                            <option value="🌧️ Hujan">🌧️ Hujan</option>
+                            <option value="☁️ Mendung">☁️ Mendung</option>
+                            <option value="🌈 Pelangi">🌈 Pelangi</option>
+                            <option value="🌙 Malam Cerah">🌙 Malam Cerah</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold opacity-70 mb-1">Lokasi</label>
+                        <input type="text" id="jLocation" placeholder="Mis: Cafe Senja" class="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-semibold outline-none focus:ring-2 focus:ring-brand-400">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold opacity-70 mb-1">Tags</label>
+                    <input type="text" id="jTags" placeholder="Mis: #kencan, #food, #happy" class="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-brand-400 text-sm font-semibold">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold opacity-70 mb-1">Cerita</label>
+                    <textarea id="jContent" rows="4" placeholder="Hari ini aku..." required class="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none focus:ring-2 focus:ring-brand-400 leading-relaxed"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold opacity-70 mb-1">Foto Momen</label>
+                    <input type="file" accept="image/*" onchange="handleImageInput(this, 'jImgPreview')" class="block w-full text-xs file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-brand-500/20 file:text-brand-600 cursor-pointer">
+                    <img id="jImgPreview" src="" class="mt-3 rounded-xl max-h-40 w-full object-cover hidden border border-slate-200 shadow-sm cursor-pointer" onclick="openLightbox(this.src, 'Preview')">
+                </div>
+                <button type="submit" class="w-full bg-brand-500 text-white font-bold py-4 rounded-2xl shadow-md hover:bg-brand-600 transition">
+                    Simpan Jurnal
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- FULL SCREEN LIGHTBOX MODAL (Scrollable & Resizable) -->
+    <div id="lightboxModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-[100] flex flex-col p-4 hidden overflow-y-auto" onclick="closeModal('lightboxModal')">
+        <div class="min-h-full flex items-center justify-center py-10 relative">
+            <button class="fixed top-6 right-6 text-white/70 hover:text-white bg-white/10 rounded-full p-2 z-50 transition" onclick="closeModal('lightboxModal')"><i data-lucide="x" class="w-6 h-6"></i></button>
+            <img id="lightboxImg" src="" class="max-w-full rounded-lg shadow-2xl object-contain cursor-zoom-out" onclick="event.stopPropagation()">
+        </div>
+        <p id="lightboxCaption" class="fixed bottom-6 w-full text-white/80 text-sm font-bold text-center pointer-events-none"></p>
+    </div>
+
+    <!-- Alert Modal -->
+    <div id="alertModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 hidden" onclick="closeModal('alertModal')">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 max-w-xs w-full text-center shadow-2xl" onclick="event.stopPropagation()">
+            <div id="alertIcon" class="text-4xl mb-3">💖</div>
+            <h4 id="alertTitle" class="font-display font-bold text-lg mb-1">Judul</h4>
+            <p id="alertMsg" class="text-sm opacity-70 mb-5">Pesan</p>
+            <button onclick="closeModal('alertModal')" class="w-full bg-brand-500 text-white font-bold py-2.5 rounded-xl text-sm">Oke</button>
+        </div>
+    </div>
+
+    <!-- LOGIC -->
+    <script>
+        lucide.createIcons();
+
+        // Colors for Donut Chart
+        const chartColors = [
+            '#f43f5e', '#a78bfa', '#34d399', '#fb923c', '#38bdf8', 
+            '#fb7185', '#c084fc', '#4ade80', '#facc15', '#60a5fa'
+        ];
+
+        const defaultCategories = [
+            { id: 'c1', name: 'Makanan & Jajan', emoji: '🍜' },
+            { id: 'c2', name: 'Skincare', emoji: '💄' },
+            { id: 'c3', name: 'Belanja', emoji: '🛍️' },
+            { id: 'c4', name: 'Transport', emoji: '🛵' },
+            { id: 'c5', name: 'Gaji/Pemasukan', emoji: '💸' }
+        ];
+
+        let settings = JSON.parse(localStorage.getItem('sandrApp_settings')) || {
+            appName: "Sandra's App", userName: "Sandra",
+            avatar: "https://placehold.co/150x150/fda4af/ffffff?text=S",
+            quote: "Semoga harimu selalu ceria!", theme: "pink", isFirstLoad: true,
+            spotifyLink: "https://open.spotify.com/playlist/37i9dQZF1DX5IDTimETr5h" // Default: Romantic Acoustic
+        };
+        let categories = JSON.parse(localStorage.getItem('sandrApp_categories')) || defaultCategories;
+        
+        let initialTx = [{
+            id: 'tx_init', type: 'expense', amount: 45000, category: 'Makanan & Jajan',
+            date: new Date().toISOString().split('T')[0], note: 'Mie Gacoan', location: 'Tebet', photo: null
+        }];
+        let transactions = JSON.parse(localStorage.getItem('sandrApp_transactions')) || initialTx;
+        
+        let initialJournal = [{
+            id: 'j_init', title: 'Coffee Date ✨', mood: '🥰 Happy', weather: '☀️ Cerah',
+            date: new Date().toISOString().split('T')[0], location: 'Fore Coffee', tags: '#date, #coffee',
+            content: 'Hari ini seru banget nongkrong bareng di Fore Coffee. Vibesnya asik buat ngobrol dan nyantai lama-lama.', photo: null
+        }];
+        let journals = JSON.parse(localStorage.getItem('sandrApp_journals')) || initialJournal;
+        
+        let myChart = null;
+
+        window.onload = () => {
+            applySettings();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('txDate').value = today;
+            document.getElementById('jDate').value = today;
+            renderCategories();
+            renderTransactions();
+            renderJournals();
+            spawnHearts();
+
+            // Ulang Tahun Confetti Alert
+            if(settings.isFirstLoad) {
+                setTimeout(() => {
+                    confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#f43f5e', '#a78bfa', '#34d399', '#facc15'] });
+                    customAlert("Happy Birthday, Sandra Wulansari K.T! 🎉", "Selamat ulang tahun sayang! Semoga suka kado aplikasinya yaa. 💕", "🎂");
+                    settings.isFirstLoad = false;
+                    localStorage.setItem('sandrApp_settings', JSON.stringify(settings));
+                }, 800);
+            }
+        };
+
+        // Spotify Embed Converter
+        function getSpotifyEmbedUrl(url) {
+            if (!url) return "";
+            try {
+                let urlObj = new URL(url);
+                if (urlObj.hostname !== 'open.spotify.com') return "";
+                let path = urlObj.pathname;
+                return `https://open.spotify.com/embed${path}?utm_source=generator&theme=0`;
+            } catch (e) {
+                return ""; // Invalid URL
+            }
+        }
+
+        function updateSpotifyIframe() {
+            let embedUrl = getSpotifyEmbedUrl(settings.spotifyLink);
+            let frameDesktop = document.getElementById('spotifyFrameDesktop');
+            let frameMobile = document.getElementById('spotifyFrameMobile');
+            
+            if(embedUrl) {
+                if(frameDesktop.src !== embedUrl) frameDesktop.src = embedUrl;
+                if(frameMobile.src !== embedUrl) frameMobile.src = embedUrl;
+                frameDesktop.parentElement.parentElement.classList.remove('hidden');
+                frameMobile.parentElement.parentElement.classList.remove('hidden');
+            } else {
+                frameDesktop.parentElement.parentElement.classList.add('hidden');
+                frameMobile.parentElement.parentElement.classList.add('hidden');
+            }
+        }
+
+        function spawnHearts() {
+            const container = document.getElementById('heartsContainer');
+            setInterval(() => {
+                if(document.hidden) return;
+                const heart = document.createElement('div');
+                heart.className = 'heart-bg';
+                heart.innerHTML = ['💖', '💕', '✨', '🌸'][Math.floor(Math.random() * 4)];
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDuration = (Math.random() * 5 + 6) + 's';
+                container.appendChild(heart);
+                setTimeout(() => heart.remove(), 12000);
+            }, 800);
+        }
+
+        function switchTab(tabId) {
+            ['money', 'journal', 'settings'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                
+                let dNav = document.getElementById(`nav-desktop-${t}`);
+                if(dNav) dNav.className = "w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all opacity-70 hover:opacity-100 hover:bg-brand-500/10";
+                
+                let mNav = document.getElementById(`nav-mobile-${t}`);
+                if(mNav) {
+                    mNav.classList.remove('text-brand-500');
+                    mNav.classList.add('text-slate-400');
+                }
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            
+            let activeDNav = document.getElementById(`nav-desktop-${tabId}`);
+            if(activeDNav) activeDNav.className = "w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all bg-brand-500 text-white shadow-md";
+            
+            let activeMNav = document.getElementById(`nav-mobile-${tabId}`);
+            if(activeMNav) {
+                activeMNav.classList.remove('text-slate-400');
+                activeMNav.classList.add('text-brand-500');
+            }
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function openActionMenu() { openModal('actionMenuModal'); }
+
+        function customAlert(title, msg, icon="💖") {
+            document.getElementById('alertTitle').innerText = title;
+            document.getElementById('alertMsg').innerText = msg;
+            document.getElementById('alertIcon').innerText = icon;
+            openModal('alertModal');
+        }
+
+        function formatRp(num) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
+        }
+
+        function formatCurrencyInput(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (!value) {
+                input.value = '';
+                return;
+            }
+            input.value = parseInt(value, 10).toLocaleString('id-ID');
+        }
+
+        // Settings
+        function applySettings() {
+            document.documentElement.setAttribute('data-theme', settings.theme);
+            if(settings.theme === 'dark') document.documentElement.classList.add('dark');
+            else document.documentElement.classList.remove('dark');
+
+            let plusBtn = document.getElementById('mobilePlusBtn');
+            if(plusBtn) {
+                plusBtn.style.borderColor = settings.theme === 'dark' ? '#0f172a' : 'var(--bg-body)';
+            }
+
+            document.getElementById('sidebarAppName').innerText = settings.appName;
+            document.getElementById('mobileAppName').innerText = settings.appName;
+            document.getElementById('sidebarUserName').innerText = `Halo, ${settings.userName}! 💕`;
+            document.getElementById('mobileUserName').innerText = `Halo, ${settings.userName}! 💕`;
+            document.getElementById('sidebarQuote').innerText = `"${settings.quote}"`;
+            document.getElementById('sidebarAvatar').src = settings.avatar;
+            document.getElementById('mobileAvatar').src = settings.avatar;
+            document.getElementById('previewSetAvatar').src = settings.avatar;
+
+            document.getElementById('setAppName').value = settings.appName;
+            document.getElementById('setUserName').value = settings.userName;
+            document.getElementById('setQuote').value = settings.quote;
+            document.getElementById('setSpotify').value = settings.spotifyLink || "";
+
+            updateSpotifyIframe();
+
+            if(transactions.length > 0) updateChart();
+        }
+
+        function changeTheme(color) {
+            settings.theme = color;
+            applySettings();
+        }
+
+        function handleSettingsAvatar(input) {
+            if (input.files && input.files[0]) {
+                const r = new FileReader();
+                r.onload = e => { settings.avatar = e.target.result; applySettings(); };
+                r.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function savePersonalization() {
+            settings.appName = document.getElementById('setAppName').value || "App";
+            settings.userName = document.getElementById('setUserName').value || "User";
+            settings.quote = document.getElementById('setQuote').value;
+            settings.spotifyLink = document.getElementById('setSpotify').value;
+            localStorage.setItem('sandrApp_settings', JSON.stringify(settings));
+            applySettings();
+            customAlert("Tersimpan!", "Tema, lagu, dan profil udah diganti.", "✨");
+        }
+
+        // Transactions & Categories
+        function setTxType(type) {
+            document.getElementById('txType').value = type;
+            const bE = document.getElementById('btnExpense');
+            const bI = document.getElementById('btnIncome');
+            if (type === 'expense') {
+                bE.className = "py-2.5 text-sm font-bold rounded-xl bg-white dark:bg-slate-600 shadow-sm text-rose-500 transition";
+                bI.className = "py-2.5 text-sm font-bold rounded-xl text-slate-500 dark:text-slate-300 transition";
+            } else {
+                bI.className = "py-2.5 text-sm font-bold rounded-xl bg-white dark:bg-slate-600 shadow-sm text-emerald-500 transition";
+                bE.className = "py-2.5 text-sm font-bold rounded-xl text-slate-500 dark:text-slate-300 transition";
+            }
+        }
+
+        function renderCategories() {
+            const sel = document.getElementById('txCategory');
+            const fil = document.getElementById('filterCat');
+            const list = document.getElementById('categoryList');
+            sel.innerHTML = ''; fil.innerHTML = '<option value="ALL">Semua</option>'; list.innerHTML = '';
+
+            categories.forEach(c => {
+                sel.innerHTML += `<option value="${c.name}">${c.emoji} ${c.name}</option>`;
+                fil.innerHTML += `<option value="${c.name}">${c.emoji} ${c.name}</option>`;
+                list.innerHTML += `
+                    <div class="flex justify-between p-3 bg-slate-50 dark:bg-slate-700 rounded-xl border border-slate-100 dark:border-slate-600">
+                        <span class="font-semibold text-sm">${c.emoji} ${c.name}</span>
+                        <button onclick="deleteCategory('${c.id}')" class="text-rose-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </div>`;
+            });
+            lucide.createIcons();
+        }
+
+        function addCategory(e) {
+            e.preventDefault();
+            const em = document.getElementById('catEmoji').value, nm = document.getElementById('catName').value;
+            if(!em || !nm) return;
+            categories.push({ id: 'c_'+Date.now(), emoji:em, name:nm });
+            localStorage.setItem('sandrApp_categories', JSON.stringify(categories));
+            e.target.reset(); renderCategories();
+        }
+
+        function deleteCategory(id) {
+            categories = categories.filter(c => c.id !== id);
+            localStorage.setItem('sandrApp_categories', JSON.stringify(categories));
+            renderCategories();
+        }
+
+        function saveTransaction(e) {
+            e.preventDefault();
+            const img = document.getElementById('txImgPreview');
+            const rawAmount = document.getElementById('txAmount').value.replace(/\./g, '');
+            
+            const tx = {
+                id: 'tx_'+Date.now(),
+                type: document.getElementById('txType').value,
+                amount: parseFloat(rawAmount) || 0,
+                category: document.getElementById('txCategory').value,
+                date: document.getElementById('txDate').value,
+                note: document.getElementById('txNote').value,
+                location: document.getElementById('txLocation').value,
+                photo: img.classList.contains('hidden') ? null : img.src
+            };
+            transactions.unshift(tx);
+            localStorage.setItem('sandrApp_transactions', JSON.stringify(transactions));
+            e.target.reset(); img.classList.add('hidden'); img.src='';
+            closeModal('transactionModal'); renderTransactions();
+            customAlert("Berhasil!", "Uang tercatat.", "💰");
+        }
+
+        function deleteTransaction(id) {
+            transactions = transactions.filter(t => t.id !== id);
+            localStorage.setItem('sandrApp_transactions', JSON.stringify(transactions));
+            renderTransactions();
+        }
+
+        function renderTransactions() {
+            const list = document.getElementById('transactionList');
+            const filter = document.getElementById('filterCat').value;
+            list.innerHTML = '';
+            
+            let filtered = filter !== 'ALL' ? transactions.filter(t => t.category === filter) : transactions;
+            let tIn = 0, tEx = 0;
+
+            if(filtered.length === 0) list.innerHTML = `<div class="text-center opacity-50 text-sm mt-5">Kosong.</div>`;
+
+            filtered.forEach(t => {
+                if(t.type === 'income') tIn += t.amount; else tEx += t.amount;
+                const c = categories.find(x => x.name === t.category) || {emoji:'📝'};
+                const isE = t.type === 'expense';
+                let photoBtn = t.photo ? `<button onclick="openLightbox('${t.photo}', '${t.note}')" class="mt-2 text-[10px] bg-brand-500/10 text-brand-600 px-2 py-1 rounded border border-brand-500/20 flex items-center gap-1 font-bold"><i data-lucide="image" class="w-3 h-3"></i> Foto</button>` : '';
+                let locBadge = t.location ? `<span class="text-[10px] bg-black/10 px-1.5 rounded font-semibold flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> ${t.location}</span>` : '';
+
+                list.innerHTML += `
+                    <div class="bg-black/5 p-4 rounded-2xl flex justify-between items-start">
+                        <div class="flex gap-3">
+                            <div class="w-10 h-10 bg-white dark:bg-slate-700 rounded-xl shadow-sm flex items-center justify-center text-lg">${c.emoji}</div>
+                            <div>
+                                <h4 class="font-bold text-sm">${t.note}</h4>
+                                <div class="flex flex-wrap items-center gap-2 mt-1">
+                                    <span class="text-[10px] opacity-60">${t.date}</span>
+                                    <span class="text-[10px] bg-black/10 px-1.5 rounded font-semibold">${t.category}</span>
+                                    ${locBadge}
+                                </div>
+                                ${photoBtn}
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-bold text-sm ${isE ? 'text-rose-500' : 'text-emerald-500'}">${isE ? '-' : '+'} ${formatRp(t.amount)}</span>
+                            <button onclick="deleteTransaction('${t.id}')" class="block ml-auto mt-2 opacity-30 hover:opacity-100 text-rose-500"><i data-lucide="trash" class="w-3.5 h-3.5"></i></button>
+                        </div>
+                    </div>`;
+            });
+            
+            let summaryHTML = '';
+            if(filter !== 'ALL') {
+                if(tEx > 0) summaryHTML += `<div class="text-xs font-bold text-rose-500 bg-rose-500/10 px-3 py-2.5 rounded-xl mb-3 border border-rose-500/20 flex justify-between shadow-sm"><span>Total Keluar (${filter})</span><span>${formatRp(tEx)}</span></div>`;
+                if(tIn > 0) summaryHTML += `<div class="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-3 py-2.5 rounded-xl mb-3 border border-emerald-500/20 flex justify-between shadow-sm"><span>Total Masuk (${filter})</span><span>${formatRp(tIn)}</span></div>`;
+                list.innerHTML = summaryHTML + list.innerHTML;
+            }
+
+            if(filter === 'ALL') {
+                document.getElementById('totalBalance').innerText = formatRp(tIn - tEx);
+                document.getElementById('totalIncome').innerText = formatRp(tIn);
+                document.getElementById('totalExpense').innerText = formatRp(tEx);
+            }
+            lucide.createIcons(); updateChart();
+        }
+
+        // Analytics
+        function updateChart() {
+            const ctx = document.getElementById('expenseChart');
+            const leg = document.getElementById('chartLegend');
+            if(!ctx) return;
+            
+            let exp = transactions.filter(t => t.type === 'expense');
+            let totals = {};
+            let gt = 0;
+            
+            exp.forEach(t => { totals[t.category] = (totals[t.category] || 0) + t.amount; gt += t.amount; });
+
+            let labels = [], data = [], bgColors = [];
+            leg.innerHTML = '';
+            
+            let idx = 0;
+            for (let cat in totals) {
+                const val = totals[cat];
+                const pct = gt > 0 ? Math.round((val/gt)*100) : 0;
+                const c = categories.find(x => x.name === cat) || {emoji:'🏷️'};
+                const color = chartColors[idx % chartColors.length];
+                
+                labels.push(cat); data.push(val); bgColors.push(color);
+                
+                leg.innerHTML += `
+                    <div class="flex items-center justify-between text-xs mb-1 p-2 rounded-lg bg-black/5 hover:bg-black/10 cursor-pointer" onclick="document.getElementById('filterCat').value='${cat}'; renderTransactions();">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full" style="background-color:${color}"></span>
+                            <span class="font-semibold">${c.emoji} ${cat}</span>
+                        </div>
+                        <div class="font-bold">${pct}%</div>
+                    </div>`;
+                idx++;
+            }
+
+            if(data.length === 0) {
+                labels.push("Kosong"); data.push(1); bgColors.push(settings.theme==='dark'?'#334155':'#e2e8f0');
+                leg.innerHTML = '<div class="text-xs text-center opacity-50 py-2">Belum ada pengeluaran.</div>';
+            }
+
+            if(myChart) myChart.destroy();
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels, datasets: [{ data, backgroundColor: bgColors, borderWidth: 0 }] },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '70%',
+                    plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ' ' + formatRp(ctx.raw) } } }
+                }
+            });
+        }
+
+        // Journal
+        function saveJournal(e) {
+            e.preventDefault();
+            const img = document.getElementById('jImgPreview');
+            const j = {
+                id: 'j_'+Date.now(),
+                title: document.getElementById('jTitle').value,
+                mood: document.getElementById('jMood').value,
+                weather: document.getElementById('jWeather').value,
+                date: document.getElementById('jDate').value,
+                location: document.getElementById('jLocation').value,
+                tags: document.getElementById('jTags').value,
+                content: document.getElementById('jContent').value,
+                photo: img.classList.contains('hidden') ? null : img.src
+            };
+            journals.unshift(j);
+            localStorage.setItem('sandrApp_journals', JSON.stringify(journals));
+            e.target.reset(); img.classList.add('hidden'); img.src='';
+            closeModal('journalModal'); renderJournals();
+            customAlert("Tersimpan!", "Ceritamu udah diabadikan.", "📖");
+        }
+
+        function deleteJournal(id) {
+            journals = journals.filter(j => j.id !== id);
+            localStorage.setItem('sandrApp_journals', JSON.stringify(journals));
+            renderJournals();
+        }
+
+        function renderJournals() {
+            const grid = document.getElementById('journalGrid');
+            grid.innerHTML = '';
+            if(journals.length === 0) { grid.innerHTML = `<div class="col-span-full text-center opacity-50 py-10">Belum ada jurnal.</div>`; return; }
+
+            journals.forEach(j => {
+                let imgHTML = j.photo ? `
+                    <div class="h-40 w-full rounded-xl overflow-hidden mt-3 cursor-pointer relative group" onclick="openLightbox('${j.photo}', '${j.title}')">
+                        <img src="${j.photo}" class="w-full h-full object-cover group-hover:scale-105 transition">
+                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition"><i data-lucide="maximize" class="text-white w-6 h-6"></i></div>
+                    </div>` : '';
+                
+                let tagsHTML = '';
+                if(j.tags) {
+                    let tagsArr = j.tags.split(',').map(t => t.trim()).filter(t => t.length > 0);
+                    tagsArr.forEach(t => {
+                        let tagText = t.startsWith('#') ? t : `#${t}`;
+                        tagsHTML += `<span class="text-[10px] font-bold text-brand-600 bg-brand-500/10 px-1.5 py-0.5 rounded mr-1">${tagText}</span>`;
+                    });
+                }
+
+                let locWeatherHTML = '';
+                if(j.weather || j.location) {
+                    let weatherText = j.weather ? j.weather : '';
+                    let locText = j.location ? `<span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> ${j.location}</span>` : '';
+                    locWeatherHTML = `<div class="flex items-center gap-3 text-[10px] font-bold opacity-60 mb-2 mt-1">
+                                        ${weatherText ? `<span>${weatherText}</span>` : ''}
+                                        ${locText}
+                                      </div>`;
+                }
+
+                grid.innerHTML += `
+                    <div class="glass-panel rounded-3xl p-5 shadow-sm border border-white/20 flex flex-col hover:-translate-y-1 transition transform duration-300">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-bold bg-black/10 px-2 py-1 rounded-lg">${j.mood || ''}</span>
+                            <span class="text-[10px] opacity-60 ml-auto mr-3 flex items-center">${j.date}</span>
+                            <button onclick="deleteJournal('${j.id}')" class="opacity-40 hover:opacity-100 text-rose-500"><i data-lucide="trash" class="w-4 h-4"></i></button>
+                        </div>
+                        <h4 class="font-display font-bold text-lg leading-tight">${j.title}</h4>
+                        ${locWeatherHTML}
+                        <p class="text-sm opacity-80 flex-1 mt-1 leading-relaxed">${j.content}</p>
+                        <div class="mt-2 flex flex-wrap gap-1">
+                            ${tagsHTML}
+                        </div>
+                        ${imgHTML}
+                    </div>`;
+            });
+            lucide.createIcons();
+        }
+
+        // Utils
+        function handleImageInput(input, imgId) {
+            const p = document.getElementById(imgId);
+            if (input.files && input.files[0]) {
+                const r = new FileReader();
+                r.onload = e => { p.src = e.target.result; p.classList.remove('hidden'); };
+                r.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function openLightbox(src, caption) {
+            document.getElementById('lightboxImg').src = src;
+            document.getElementById('lightboxCaption').innerText = caption || '';
+            openModal('lightboxModal');
+        }
+
+        function exportData() {
+            const d = { settings, categories, transactions, journals };
+            const b = new Blob([JSON.stringify(d)], { type: 'application/json' });
+            const u = URL.createObjectURL(b);
+            const a = document.createElement('a'); a.href = u; a.download = `Sandra_Backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click(); URL.revokeObjectURL(u);
+        }
+
+        function importData(e) {
+            const f = e.target.files[0]; if(!f) return;
+            const r = new FileReader();
+            r.onload = evt => {
+                try {
+                    const p = JSON.parse(evt.target.result);
+                    if(p.settings) settings = p.settings; if(p.categories) categories = p.categories;
+                    if(p.transactions) transactions = p.transactions; if(p.journals) journals = p.journals;
+                    localStorage.setItem('sandrApp_settings', JSON.stringify(settings));
+                    localStorage.setItem('sandrApp_categories', JSON.stringify(categories));
+                    localStorage.setItem('sandrApp_transactions', JSON.stringify(transactions));
+                    localStorage.setItem('sandrApp_journals', JSON.stringify(journals));
+                    applySettings(); renderCategories(); renderTransactions(); renderJournals();
+                    customAlert("Sukses!", "Data dikembalikan.", "🎉");
+                } catch(err) { customAlert("Error", "File JSON tidak valid.", "❌"); }
+            };
+            r.readAsText(f);
+        }
+    </script>
+</body>
+</html>
